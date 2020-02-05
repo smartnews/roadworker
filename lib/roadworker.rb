@@ -7,6 +7,7 @@ require 'uri'
 require 'uuid'
 require 'diffy'
 require 'hashie'
+require 'retryable'
 
 require 'roadworker/string-ext'
 require 'roadworker/struct-ext'
