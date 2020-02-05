@@ -16,15 +16,22 @@ module Roadworker
     def apply(file)
       dsl = load_file(file)
       updated = false
+      retry_setting = {
+          on: [Aws::EC2::Errors::RequestLimitExceeded],
+          tries: 5,
+          sleep: ->(n) {4 ** n}
+      }
 
-      if dsl.hosted_zones.empty? and not @options.force
-        log(:warn, "Nothing is defined (pass `--force` if you want to remove)", :yellow)
-      else
-        updated = walk_hosted_zones(dsl)
-      end
+      Retryable.retryable do | retries, exception|
+        if dsl.hosted_zones.empty? and not @options.force
+          log(:warn, "Nothing is defined (pass `--force` if you want to remove)", :yellow)
+        else
+          updated = walk_hosted_zones(dsl)
+        end
 
-      if updated and @options.health_check_gc
-        HealthCheck.gc(@options.route53, :logger => @options.logger)
+        if updated and @options.health_check_gc
+          HealthCheck.gc(@options.route53, :logger => @options.logger)
+        end
       end
 
       return updated
