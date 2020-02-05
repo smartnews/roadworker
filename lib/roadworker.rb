@@ -8,7 +8,7 @@ require 'uuid'
 require 'diffy'
 require 'hashie'
 require 'retryable'
-require 'aws-sdk-route53'
+require 'aws-sdk'
 
 require 'roadworker/string-ext'
 require 'roadworker/struct-ext'
